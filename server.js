@@ -5,8 +5,10 @@ const express = require("express");
 const axios = require("axios");
 const fs = require("fs");
 
-const OMDB_API_KEY = "1e72af49";
-const TMDB_API_KEY = "bc3fc08ae883070cd11b8538f3cadf28";
+require("dotenv").config();
+
+const OMDB_API_KEY = process.env.OMDB_API_KEY;
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const RESPONSE_FILE = "respostas.json";
 
 //funcao que vai pegar os dados das APIS
@@ -57,5 +59,57 @@ async function moviesData(title, year) {
 function saveResponseToFile(respostaData) {
     let savedToResponses = [];
 
+    //ler o arquivo se já existir
+    if (fs.existsSync(RESPONSE_FILE)) {
+        const fileData = fs.readFileSync(RESPONSE_FILE, "utf-8");
+        if (fileData) {
+            savedToResponses = JSON.parse(fileData);
+        }
+    }
 
+    //adicionar a nova consulta para o arquivo
+    savedToResponses.push(respostaData);
+    fs.writeFileSync(RESPONSE_FILE, JSON.stringify(savedToResponses, null, 2), "utf-8");
+
+    console.log("reposta salva no arquivo");
+}
+
+// funcao que vai exibir os filme salvos
+
+function saveMovies() {
+    if (!fs.existsSync(RESPONSE_FILE)) {
+        console.log("\nainda nao tem filme salvos");
+        return;
+    }
+
+    const fileData = fs.readFileSync(RESPONSE_FILE, "utf-8");
+    const savedToResponses = JSON.parse(fileData);
+
+    if (savedToResponses.length == 0) {
+        console.log("\nainda nao tem filme salvos");
+        return;
+    }
+
+    console.log("\n Filmes ja buscados: ");
+    savedToResponses.forEach((movie, index) => {
+        console.log(`${index + 1}. ${movie.titulo} (${movie.ano})`);
+        console.log(`sinopse: ${movie.sinopse}`);
+        console.log("reviews: ");
+
+        if (movie.reviews.length > 0) {
+            movie.reviews.forEach((review, i) => {
+                console.log(`   ${i + 1}. ${review}`);
+            });
+        } else {
+            console.log("   Nenhuma review disponivel ");
+        }
+        console.log("\n--------------------------------------------------\n");
+    });
+
+    console.log("\n para mias detalhes, basta acessar o arquivo")
+}
+
+//funcao main para interagir com as apis
+
+async function main() {
 }
