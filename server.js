@@ -14,7 +14,7 @@ function formatReview(reviewText) {
     // Remove quebras de linha desnecessárias
     let formattedReview = reviewText.replace(/(\r\n|\n|\r)/gm, ' ').trim();
 
-    // Limitar o tamanho da review para 500 caracteres (ajuste conforme necessário)
+    // Limitar o tamanho da review para 500 caracteres
     if (formattedReview.length > 500) {
         formattedReview = formattedReview.substring(0, 500) + '...';
     }
